@@ -1,10 +1,12 @@
 import * as Yup from 'yup';
 import { startOfHour, parseISO, isBefore, format } from 'date-fns';
 import pt from 'date-fns/locale/pt-BR';
+
 import Appointment from '../models/Appointment';
 import User from '../models/User';
 import File from '../models/File';
 import Notification from '../schemas/Notification';
+
 class AppointmentController {
   async index(req, res) {
     const { page = 1 } = req.query;
@@ -48,6 +50,12 @@ class AppointmentController {
     }
 
     const { provider_id, date } = req.body;
+
+    if (req.userId == provider_id) {
+      return res
+        .status(400)
+        .json({ error: 'You cannot create appointment for yourself' });
+    }
 
     /**
      * Check if provider_id is a provider
